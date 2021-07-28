@@ -1,0 +1,24 @@
+{
+    "manifest_version": 3,
+    "name": "Rabat",
+    "version": "0.1.0",
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_icon": {
+            "16": "icon16.png",
+            "48": "icon48.png",
+            "128": "icon128.png"
+        },
+        "default_title": "UIUC timeline export tool"
+    },
+    "permissions": [
+        "tabs",
+        "storage"
+    ],
+    "host_permissions": [
+        "https://*.google.com/",
+        "https://*.transitstudy.web.illinois.edu/"
+    ]
+}
