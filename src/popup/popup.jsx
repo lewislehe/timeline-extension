@@ -4,8 +4,8 @@ import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
+// import FormControlLabel from "@material-ui/core/FormControlLabel";
+// import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
 import Box from "@material-ui/core/Box";
@@ -14,29 +14,33 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import useStyles from "./useStyles.js";
 
-chrome.storage.sync.get(["email"], function (result) {
-  render(<App email={result.email} />, document.getElementById("root"));
+const root = document.getElementById("root");
+chrome.storage.sync.get(["email", "name"], (result) => {
+  console.log(result)
+  const email = result.email || '';
+  const name = result.name || '';
+  render(<App email={email} name={name} />, root);
 });
 
-function App({ email }) {
+function App({ email, name }) {
   const classes = useStyles();
-  const [val, setEmail] = useState(email);
   const [sent, setSent] = useState(false);
-  const inputEl = useRef(2);
+  const emailInput = useRef(2);
+  const nameInput = useRef(2);
 
-  const tester = (e) => {
+  const onClick = (e) => {
     e.preventDefault();
-    const newEmail = inputEl.current.value;
     setSent(true);
-    chrome.storage.sync.set({ email: newEmail }, () => {
-      if (chrome.runtime.error) {
-        console.log("Runtime error.");
-      }
-      setEmail(newEmail);
-    });
-
-    chrome.runtime.sendMessage(newEmail, (response) => {
-      console.log(response);
+    const newEmail = emailInput.current.value;
+    const newName = nameInput.current.value;
+    chrome.storage.sync.set({ email: newEmail, name: newName }, () => {
+      if (chrome.runtime.error) console.log("Runtime error.");
+      chrome.runtime.sendMessage(
+        { email: newEmail, name: newName },
+        (response) => {
+          console.log(response);
+        }
+      );
     });
   };
 
@@ -59,9 +63,9 @@ function App({ email }) {
               required
               fullWidth
               id="name"
-              inputRef={inputEl}
+              inputRef={nameInput}
               disabled={sent}
-              // defaultValue=
+              defaultValue={name}
               label="Name"
               name="name"
               autoComplete="name"
@@ -73,30 +77,14 @@ function App({ email }) {
               required
               fullWidth
               id="email"
-              inputRef={inputEl}
+              inputRef={emailInput}
               disabled={sent}
               defaultValue={email}
               label="Email Address"
               name="email"
               autoComplete="email"
               helperText="Please use the email you used to sign up for the study."
-              // autoFocus
             />
-            {/* <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            /> */}
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
             <Button
               type="submit"
               fullWidth
@@ -104,7 +92,7 @@ function App({ email }) {
               variant="contained"
               color="primary"
               className={classes.submit}
-              onClick={tester}
+              onClick={onClick}
             >
               Send Data / Compartir Data
             </Button>
@@ -127,7 +115,6 @@ function App({ email }) {
               <Link href="#" variant="body2">
                 Click Here
               </Link>
-              .{/* <Copyright /> */}
             </Box>
             <Box mt={2} variant="body2">
               Usted ha elegido participar en el Last Mile Study por University
@@ -137,8 +124,6 @@ function App({ email }) {
               recibir mas beneficios, tal como creditos de Uber. Para obtener
               más información, <Link href="#">haga click acqui.</Link> Gracias
               por su participacion.
-              {/* You have elected to participate in the UIUC Last Mile Study. By clicking the link above, you will share with us the travel information necessary to complete the study. For more information <Link href="#" variant="body2">Click Here</Link>. */}
-              {/* <Copyright /> */}
             </Box>
           </form>
         </div>
