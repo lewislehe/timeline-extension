@@ -1,3 +1,4 @@
 node_modules
 dist
 asdf.code-workspace
+*.zip

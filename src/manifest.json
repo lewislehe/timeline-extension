@@ -1,20 +1,19 @@
 {
     "manifest_version": 3,
-    "name": "Rabat",
+    "name": "UIUC Last Mile study timeline share tool",
     "version": "0.1.0",
     "background": {
         "service_worker": "background.js"
     },
     "action": {
         "default_icon": {
-            "16": "icon16.png",
-            "48": "icon48.png",
-            "128": "icon128.png"
+            "16": "block-i-orange-background-16.png",
+            "48": "block-i-orange-background-48.png",
+            "128": "block-i-orange-background-128.png"
         },
-        "default_title": "UIUC timeline export tool"
+        "default_title": "UIUC Last Mile study timeline share tool"
     },
     "permissions": [
-        "tabs",
         "storage"
     ],
     "host_permissions": [

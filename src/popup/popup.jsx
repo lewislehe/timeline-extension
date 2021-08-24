@@ -8,39 +8,44 @@ import TextField from "@material-ui/core/TextField";
 // import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
+import Alert from "@material-ui/lab/Alert";
+// import Box from "@material-ui/core/Box";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import useStyles from "./useStyles.js";
 
 const root = document.getElementById("root");
-chrome.storage.sync.get(["email", "name"], (result) => {
-  console.log(result)
-  const email = result.email || '';
-  const name = result.name || '';
-  render(<App email={email} name={name} />, root);
+chrome.storage.sync.get(["email", "name", "phone"], (result) => {
+  console.log(result);
+  const email = result.email || "";
+  const name = result.name || "";
+  const phone = result.phone || "";
+  render(<App email={email} name={name} phone={phone} />, root);
 });
 
-function App({ email, name }) {
+function App({ phone, email, name }) {
   const classes = useStyles();
   const [sent, setSent] = useState(false);
+  const [success, setSuccess] = useState(false);
   const emailInput = useRef(2);
   const nameInput = useRef(2);
+  const phoneInput = useRef(2);
 
   const onClick = (e) => {
     e.preventDefault();
     setSent(true);
     const newEmail = emailInput.current.value;
     const newName = nameInput.current.value;
-    chrome.storage.sync.set({ email: newEmail, name: newName }, () => {
+    const newPhone = phoneInput.current.value;
+    const message = { email: newEmail, name: newName, phone: newPhone };
+    chrome.storage.sync.set(message, () => {
       if (chrome.runtime.error) console.log("Runtime error.");
-      chrome.runtime.sendMessage(
-        { email: newEmail, name: newName },
-        (response) => {
-          console.log(response);
-        }
-      );
+      chrome.runtime.sendMessage(message, (response) => {
+        console.log(response);
+        setSuccess(true);
+        // alert()
+      });
     });
   };
 
@@ -54,7 +59,7 @@ function App({ email, name }) {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Send data to UIUC Team
+            Send data to UIUC Last Mile Team
           </Typography>
           <form className={classes.form}>
             <TextField
@@ -70,6 +75,20 @@ function App({ email, name }) {
               name="name"
               autoComplete="name"
               autoFocus
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="phone"
+              inputRef={phoneInput}
+              disabled={sent}
+              defaultValue={phone}
+              label="Phone Number"
+              name="phone"
+              type="tel"
+              autoComplete="tel-national"
             />
             <TextField
               variant="outlined"
@@ -94,21 +113,29 @@ function App({ email, name }) {
               className={classes.submit}
               onClick={onClick}
             >
-              Send Data / Compartir Data
+              Send Data
             </Button>
-            {/* <Grid container>
+            {success && (
+              <Alert severity="success">Data shared succesfully!</Alert>
+            )}
+            <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
+                <Link
+                  href="https://transitstudy.web.illinois.edu/"
+                  variant="body2"
+                >
+                  Click here for more information
                 </Link>
               </Grid>
-              <Grid item>
+            </Grid>
+            {/* <Grid item>
                 <Link href="#" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
-              </Grid> */}
-            {/* </Grid> */}
-            <Box mt={2} variant="body2">
+              </Grid> 
+            */}
+            {/* </Grid>
+            {/* <Box mt={2} variant="body2">
               You have elected to participate in the UIUC Last Mile Study. By
               clicking the link above, you will share with us the travel
               information necessary to complete the study. For more information{" "}
@@ -124,7 +151,7 @@ function App({ email, name }) {
               recibir mas beneficios, tal como creditos de Uber. Para obtener
               más información, <Link href="#">haga click acqui.</Link> Gracias
               por su participacion.
-            </Box>
+            </Box> */}
           </form>
         </div>
       </Grid>
